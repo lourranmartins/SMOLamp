@@ -1,7 +1,7 @@
 {
   "name": "SMOLamp – Gestão Integrada SMO",
   "short_name": "SMOLamp",
-  "start_url": "./index.html",
+  "start_url": "./SMOLamp.html",
   "display": "standalone",
   "background_color": "#f1f5f9",
   "theme_color": "#1e293b",
