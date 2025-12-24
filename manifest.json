@@ -1,0 +1,23 @@
+{
+  "name": "SMOLamp – Gestão Integrada SMO",
+  "short_name": "SMOLamp",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#1e293b",
+  "description": "Sistema de Arquivos e Iluminação Pública - PMCM",
+  "icons": [
+    {
+      "src": "SMOLamp.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "SMOLamp.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

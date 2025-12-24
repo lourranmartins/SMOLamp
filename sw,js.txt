@@ -1,0 +1,46 @@
+// Nome do cache (mude a versão se fizer grandes atualizações no futuro)
+const CACHE_NAME = "smolamp-v1-pmcm";
+
+// Lista de arquivos para salvar no cache
+const ASSETS_TO_CACHE = [
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./SMOLamp.png",
+  "./brasao_pmcm.png",
+  "./sec_obras.png"
+  // Nota: As bibliotecas externas (CDN) serão cacheadas automaticamente pelo navegador na primeira vez que carregar com internet.
+];
+
+// Instalação: Cacheia os arquivos principais
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log("[SW] Caching assets...");
+      return cache.addAll(ASSETS_TO_CACHE);
+    })
+  );
+});
+
+// Requisição: Serve do cache quando offline
+self.addEventListener("fetch", (event) => {
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      // Retorna o cache se existir, senão tenta a rede
+      return cachedResponse || fetch(event.request);
+    })
+  );
+});
+
+// Ativação: Limpa caches antigos se mudar a versão
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keyList) => {
+      return Promise.all(keyList.map((key) => {
+        if (key !== CACHE_NAME) {
+          return caches.delete(key);
+        }
+      }));
+    })
+  );
+});
