@@ -4,7 +4,7 @@ const CACHE_NAME = "smolamp-v1-pmcm";
 // Lista de arquivos para salvar no cache
 const ASSETS_TO_CACHE = [
   "./",
-  "./index.html",
+  "./SMOLamp.html",
   "./manifest.json",
   "./SMOLamp.png",
   "./brasao_pmcm.png",
@@ -43,4 +43,5 @@ self.addEventListener('activate', (event) => {
       }));
     })
   );
+
 });
