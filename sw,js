@@ -1,5 +1,5 @@
 // Nome do cache (mude a versão se fizer grandes atualizações no futuro)
-const CACHE_NAME = "smolamp-v1-pmcm";
+const CACHE_NAME = "smolamp-v2-pmcm";
 
 // Lista de arquivos para salvar no cache
 const ASSETS_TO_CACHE = [
@@ -45,3 +45,4 @@ self.addEventListener('activate', (event) => {
   );
 
 });
+
