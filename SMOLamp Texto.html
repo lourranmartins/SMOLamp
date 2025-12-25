@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>SMOLamp — Gestão Integrada</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+<link rel="icon" type="image/png" href="SMOLamp.png">
+<link rel="apple-touch-icon" href="SMOLamp.png">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.3.0/build/index.min.js"></script>
+
+<style>
+/* ================= ESTILOS GERAIS UNIFICADOS ================= */
+body{font-family:Arial,Helvetica,sans-serif;background:#f1f5f9;margin:0;padding:20px; display:flex; flex-direction:column; min-height:100vh;}
+
+/* NAV BAR (Navegação) */
+.nav-bar {
+    background: #1e293b;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.nav-logo { height: 40px; margin-right: 10px; }
+.nav-btn {
+    background: #334155;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    flex-grow: 1;
+    text-align: center;
+}
+.nav-btn.active { background: #2563eb; ring: 2px solid white; }
+
+/* CONTROLE DE ABAS */
+.tab-content { display: none; width: 100%; }
+.tab-content.active { display: block; }
+
+/* ================= ESTILOS ORIGINAIS DO ARQUIVO 1 (ARQUIVOS) ================= */
+header{background:#0f172a;color:#fff;padding:15px;border-radius:8px;margin-bottom:20px}
+h1{margin:0;font-size:1.4em}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px; flex-grow: 1;}
+.env{background:#fff;padding:15px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.env h2{margin-top:0}
+label{font-weight:bold; display:block; margin-top:10px;}
+input,button{width:100%;padding:8px;margin-top:6px; box-sizing: border-box;}
+button{background:#2563eb;color:#fff;border:none;border-radius:6px;cursor:pointer}
+table{width:100%;border-collapse:collapse;font-size:.85em;margin-top:10px}
+th,td{border-bottom:1px solid #e2e8f0;padding:6px;vertical-align:top}
+th{background:#f8fafc}
+.endereco{font-weight:bold;white-space:pre-wrap}
+
+/* AMBIENTE 2 (VISUAL) */
+#resM2 { margin-top: 15px; max-height: 600px; overflow-y: auto; padding-right: 5px; }
+#resM2::-webkit-scrollbar { width: 8px; }
+#resM2::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+#statusM2 { font-size: 0.9em; color: #ea580c; font-weight: bold; margin-top: 5px; min-height: 20px; }
+.card-arquivo { background: #fff; border: 1px solid #e2e8f0; border-left: 5px solid #10b981; border-radius: 6px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.1s; }
+.card-arquivo:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-color: #10b981; }
+.doc-titulo { display: block; font-size: 1.1rem; font-weight: 800; color: #1e293b; margin-bottom: 8px; line-height: 1.3; }
+.doc-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; align-items: center; }
+.tag-contexto { background: #dbeafe; color: #1e40af; font-weight: bold; font-size: 0.85rem; padding: 6px 10px; border-radius: 4px; text-transform: uppercase; border: 1px solid #bfdbfe; width: 100%; display: block; word-wrap: break-word; }
+.tag-item { background: #10b981; color: white; font-weight: bold; font-size: 0.8rem; padding: 4px 8px; border-radius: 4px; white-space: nowrap; }
+.doc-info-extra { font-size: 0.85rem; color: #64748b; margin-bottom: 10px; font-style: italic; padding-bottom: 5px; border-bottom: 1px solid #f1f5f9; }
+.doc-local { display: flex; gap: 15px; font-size: 0.9rem; font-weight: 600; color: #475569; background: #f8fafc; padding: 8px; border-radius: 4px; align-items: center; }
+
+/* ================= ESTILOS ORIGINAIS DO ARQUIVO 2 (ILUMINAÇÃO) ================= */
+.card{background:#fff;padding:15px;border-radius:8px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.kpi{text-align:center;border-bottom:5px solid #94a3b8}
+.kpi .valor{font-size:2em;font-weight:bold}
+.azul{border-color:#2563eb;color:#2563eb}
+.verde{border-color:#16a34a;color:#16a34a}
+.vermelho{border-color:#dc2626;color:#dc2626}
+.laranja{border-color:#f59e0b;color:#f59e0b}
+.badge{padding:3px 8px;border-radius:12px;font-size:.75em;font-weight:bold}
+.feito{background:#dcfce7;color:#166534}
+.pendente{background:#fee2e2;color:#991b1b}
+
+/* ================= RODAPÉ UNIFICADO ================= */
+footer.main-footer {
+  margin-top: 30px;
+  background: #fff;
+  padding: 15px 30px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #334155;
+  font-weight: bold;
+  font-size: 0.95em;
+  border-top: 4px solid #0f172a;
+}
+.footer-logo { height: 60px; width: auto; object-fit: contain; }
+.footer-text { text-align: center; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 15px; }
+
+@media (max-width: 900px) { 
+  .grid { grid-template-columns: 1fr; } 
+  footer.main-footer { flex-direction: column; gap: 15px; text-align: center; }
+  .kpis { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<nav class="nav-bar">
+    <img src="SMOLamp.png" alt="Icone" class="nav-logo">
+    <button class="nav-btn active" onclick="openTab('arquivos', this)">📂 Arquivos</button>
+    <button class="nav-btn" onclick="openTab('iluminacao', this)">💡 Iluminação</button>
+</nav>
+
+<div id="arquivos" class="tab-content active">
+    <header>
+        <h1>SMOLamp Arquivos — Ambientes Independentes</h1>
+    </header>
+
+    <div class="grid">
+        <div class="env">
+            <h2>Ambiente 1 — Planilhas com Abas e Gavetas</h2>
+            <label>Arquivo (Modelo 1)</label>
+            <input type="file" id="fileM1" accept=".xlsx,.xls">
+            <label>Busca</label>
+            <input type="text" id="buscaM1">
+            <button onclick="buscarM1()">Buscar</button>
+            <table>
+                <thead>
+                    <tr><th>Item</th><th>Documento</th><th>Endereço físico completo</th></tr>
+                </thead>
+                <tbody id="resM1"></tbody>
+            </table>
+        </div>
+
+        <div class="env" style="border-top: 4px solid #10b981;">
+            <h2>Ambiente 2 — Arquivo Geral</h2>
+            <label>Arquivo (Relação Geral)</label>
+            <input type="file" id="fileM2" accept=".xlsx,.xls,.csv">
+            <div id="statusM2"></div>
+            <label>Busca (Nome, Obra, Setor, Caixa...)</label>
+            <input type="text" id="buscaM2" disabled placeholder="Aguardando arquivo...">
+            <div id="resM2">
+                <div style="text-align:center; color:#999; margin-top:20px;">Carregue a planilha "RELAÇÃO ARQUIVO GERAL DUDA"</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="iluminacao" class="tab-content">
+    <header>
+        <h1>SMOLamp – Painel de Gestão de Iluminação Pública</h1>
+    </header>
+
+    <div class="card">
+        <input type="file" id="fileUpload" accept=".xlsx,.xls,.csv">
+    </div>
+
+    <div class="card kpis">
+        <div class="kpi azul"><div class="valor" id="kTotal">0</div>Total</div>
+        <div class="kpi vermelho"><div class="valor" id="kPendentes">0</div>Pendentes</div>
+        <div class="kpi verde"><div class="valor" id="kFeitos">0</div>Executados</div>
+        <div class="kpi laranja"><div class="valor" id="kEficiencia">0%</div>Eficiência</div>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <label>Data inicial</label><input type="date" id="dataInicio">
+            <label>Data final</label><input type="date" id="dataFim">
+            <label>Dias de chuva (opcional)</label><input type="number" id="diasChuva" min="0">
+            <label><input type="checkbox" id="somentePendentes"> Mostrar apenas pendentes</label>
+            <button onclick="processar()">Aplicar intervalo</button>
+            <button onclick="exportarPDF()">Exportar PDF completo</button>
+            <button onclick="exportarPDFResumo()">Exportar PDF sintético</button>
+            <button onclick="exportarDOCX()">Exportar DOCX</button>
+            <p id="medias"></p>
+            <canvas id="canvasTipos" height="200"></canvas>
+            <canvas id="canvasSemanal" height="200"></canvas>
+            <canvas id="canvasAcumulado" height="200"></canvas>
+        </div>
+
+        <div class="card">
+            <table>
+                <thead><tr><th>Data</th><th>OS</th><th>Rua</th><th>Bairro</th><th>Descrição</th><th>Status</th></tr></thead>
+                <tbody id="tabela"></tbody>
+            </table>
+            <div id="diagnostico"></div>
+        </div>
+    </div>
+</div>
+
+<footer class="main-footer">
+    <img src="brasao_pmcm.png" alt="[Brasão PMCM]" class="footer-logo">
+    <div class="footer-text">
+        Prefeitura Municipal de Cachoeiras de Macacu, 2025
+    </div>
+    <img src="sec_obras.png" alt="[Logo Sec. Obras]" class="footer-logo">
+</footer>
+
+
+<script>
+// Lógica de Abas (Simples)
+function openTab(tabName, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabName).classList.add('active');
+    btn.classList.add('active');
+}
+
+// Registro Service Worker PWA
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('SW Registrado'))
+      .catch((err) => console.log('SW Erro', err));
+}
+</script>
+
+<script>
+/* ========================================================================== */
+/* CÓDIGO FONTE ORIGINAL: SMOLamp Arquivos.html */
+/* ========================================================================== */
+
+/* ================= AMBIENTE 1 (IPSIS LITTERIS) ================= */
+let baseM1=[];
+
+document.getElementById("fileM1").addEventListener("change",e=>{
+  baseM1=[];
+  const file=e.target.files[0];
+  if(!file)return;
+
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const wb=XLSX.read(ev.target.result,{type:"array"});
+
+    wb.SheetNames.forEach(aba=>{
+      const linhas=XLSX.utils.sheet_to_json(wb.Sheets[aba],{header:1,defval:""});
+      let gavetaAtual="";
+
+      linhas.forEach(l=>{
+        const texto=l.join(" ").trim();
+        if(/^gaveta\s+\d+/i.test(texto)){gavetaAtual=texto;return;}
+        if(/^item\b/i.test(texto)) return;
+        if(!gavetaAtual) return;
+
+        if(!l[1]) return;
+
+        baseM1.push({
+          item:l[0],
+          doc:l[1],
+          endereco:`${aba} → ${gavetaAtual}${l[2] ? " → "+l[2] : ""}`,
+          busca:(l.join(" ")).toLowerCase()
+        });
+      });
+    });
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+function buscarM1(){
+  const t=document.getElementById("buscaM1").value.toLowerCase();
+  document.getElementById("resM1").innerHTML=baseM1
+    .filter(r=>r.busca.includes(t))
+    .map(r=>`
+      <tr>
+        <td>${r.item}</td>
+        <td>${r.doc}</td>
+        <td class="endereco">${r.endereco}</td>
+      </tr>`).join("");
+}
+
+/* ================= AMBIENTE 2 (LÓGICA DE QUEBRA DE SEÇÃO) ================= */
+
+function normalizar(texto) {
+  try {
+    return String(texto || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toUpperCase();
+  } catch(e) { return ""; }
+}
+
+let baseM2 = [];
+
+document.getElementById("fileM2").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const statusDiv = document.getElementById("statusM2");
+  const inputB = document.getElementById("buscaM2");
+  
+  statusDiv.innerText = "Processando arquivo... aguarde.";
+  inputB.disabled = true;
+
+  const reader = new FileReader();
+  reader.onload = ev => {
+    setTimeout(() => { 
+    try {
+      const wb = XLSX.read(ev.target.result, { type: "array" });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+
+      baseM2 = [];
+      
+      let contextoAtual = "ARQUIVO GERAL";
+      let idxItem = -1, idxDoc = -1, idxLoc1 = -1, idxLoc2 = -1;
+      let headersFound = false; 
+
+      rows.forEach((row, rowIndex) => {
+        if (!row || row.length === 0) return;
+        
+        const rowStr = normalizar(row.join("||"));
+
+        // 1. DETECTAR CABEÇALHO (NOVO CONTEXTO)
+        if (rowStr.includes("ITEM") && (rowStr.includes("DOCUMENTO") || rowStr.includes("NOME"))) {
+          
+          headersFound = true;
+
+          row.forEach((cell, k) => {
+            const cLimpo = normalizar(cell).trim();
+            const cOriginal = String(cell).trim();
+
+            if (cLimpo === "ITEM") idxItem = k;
+            else if (cLimpo.includes("DOCUMENTO") || cLimpo.includes("NOME")) {
+              idxDoc = k;
+              
+              // EXTRAI O NOME DA CAIXA/PASTA
+              let extracted = cOriginal.replace(/^NOME\s+DO\s+DOCUMENTO\s*[:\-\.]*\s*/i, "").trim();
+              
+              if (extracted.length > 1) {
+                contextoAtual = extracted;
+              } else if (row[k+1]) {
+                 contextoAtual = String(row[k+1]).trim();
+              } else {
+                 contextoAtual = "DOCUMENTOS DIVERSOS"; 
+              }
+            }
+            else if (cLimpo.includes("ESTANTE") || cLimpo.includes("ARMARIO")) idxLoc1 = k;
+            else if (cLimpo.includes("PRATELEIRA") || cLimpo.includes("GAVETA") || cLimpo.includes("CAIXA")) idxLoc2 = k;
+          });
+
+          if (idxLoc1 === -1) idxLoc1 = 6;
+          if (idxLoc2 === -1) idxLoc2 = 7;
+          
+          return; 
+        }
+
+        // 2. PROCESSAR LINHA DE DADOS
+        if (headersFound && idxItem !== -1) {
+          const valItem = row[idxItem];
+          
+          if (!valItem) return;
+          if (normalizar(valItem) === "ITEM") return;
+
+          const nomeDoc = row[idxDoc] ? String(row[idxDoc]).trim() : "Sem nome";
+          const local1 = row[idxLoc1] ? String(row[idxLoc1]).trim() : "-";
+          const local2 = row[idxLoc2] ? String(row[idxLoc2]).trim() : "-";
+
+          let infoExtra = [];
+          for(let k = 2; k < idxLoc1; k++) {
+             if(row[k] && k !== idxDoc) infoExtra.push(row[k]);
+          }
+
+          const rawSearch = [valItem, nomeDoc, contextoAtual, infoExtra.join(" "), local1, local2].join(" ");
+          
+          baseM2.push({
+            item: valItem,
+            doc: nomeDoc,
+            context: contextoAtual, 
+            extra: infoExtra.join(" | "),
+            loc1: local1,
+            loc2: local2,
+            search: normalizar(rawSearch)
+          });
+        }
+      });
+
+      statusDiv.innerText = "";
+      inputB.disabled = false;
+      inputB.placeholder = "Pesquisar por nome, caixa, setor...";
+      inputB.focus();
+      renderM2(baseM2);
+
+    } catch (err) {
+      console.error(err);
+      statusDiv.innerText = "Erro ao processar. Verifique se o arquivo está correto.";
+      statusDiv.style.color = "red";
+    }
+    }, 100);
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+document.getElementById("buscaM2").addEventListener("input", (e) => {
+  const termo = normalizar(e.target.value);
+  if(!termo) { renderM2(baseM2); return; }
+  
+  const filtrados = baseM2.filter(d => d.search.includes(termo));
+  renderM2(filtrados);
+});
+
+function renderM2(lista) {
+  const div = document.getElementById("resM2");
+  div.innerHTML = "";
+
+  const count = document.createElement("div");
+  count.style.padding = "0 0 10px 5px";
+  count.style.color = "#64748b";
+  count.style.fontSize = "0.85em";
+  count.innerText = `${lista.length} registros encontrados`;
+  div.appendChild(count);
+
+  if(lista.length === 0) {
+    div.innerHTML += "<div style='text-align:center; padding:20px; color:#888;'>Nenhum resultado.</div>";
+    return;
+  }
+
+  lista.slice(0, 100).forEach(d => {
+    const card = document.createElement("div");
+    card.className = "card-arquivo";
+    
+    card.innerHTML = `
+      <span class="doc-titulo">${d.doc}</span>
+      
+      <div class="doc-meta">
+        <span class="tag-contexto">📂 ${d.context}</span>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+         <span class="tag-item">ITEM ${d.item}</span>
+      </div>
+
+      ${d.extra ? `<div class="doc-info-extra">${d.extra}</div>` : ''}
+
+      <div class="doc-local">
+        <span>📍 ${d.loc1}</span>
+        <span style="color:#cbd5e1">|</span>
+        <span>📦 ${d.loc2}</span>
+      </div>
+    `;
+    div.appendChild(card);
+  });
+}
+</script>
+
+<script>
+/* ========================================================================== */
+/* CÓDIGO FONTE ORIGINAL: SMOLamp Iluminação 3.2.1.html */
+/* ========================================================================== */
+
+let dados=[],chartTipos=null,chartSem=null,chartAcum=null;
+
+document.getElementById("fileUpload").addEventListener("change",e=>{
+ const r=new FileReader();
+ r.onload=ev=>{
+  const wb=XLSX.read(new Uint8Array(ev.target.result),{type:"array"});
+  const aba=wb.SheetNames.find(n=>n.trim().toLowerCase().includes("ilumina")); // Pequeno ajuste: permiti que "iluminação" ou "iluminacao" funcione
+  if(!aba){alert("Aba 'Iluminação' não encontrada.");return;}
+  const sh=XLSX.utils.sheet_to_json(wb.Sheets[aba],{header:1});
+  dados=[];
+  for(let i=1;i<sh.length;i++){
+   const c=sh[i];
+   if(!c[0])continue;
+   const dp=tratarData(c[4]);
+   if(!dp)continue;
+   dados.push({
+    rua:c[0],
+    bairro:c[1]||"",
+    dataPedido:dp,
+    dataRealizado:tratarData(c[5]),
+    descricao:(c[7]||"").toString(),
+    os:c[8]||""
+   });
+  }
+ };
+ r.readAsArrayBuffer(e.target.files[0]);
+});
+
+function tratarData(v){
+ if(!v)return null;
+ if(typeof v==="number"){
+  const d=new Date((v-25569)*86400*1000);d.setHours(12);
+  return isNaN(d)?null:d;
+ }
+ if(typeof v==="string"&&v.includes("/")){
+  const p=v.split("/");
+  const d=new Date(p[2],p[1]-1,p[0]);
+  return isNaN(d)?null:d;
+ }
+ const d=new Date(v);
+ return isNaN(d)?null:d;
+}
+
+function processar(){
+ const ini=dataInicio.value,fim=dataFim.value;
+ if(!ini||!fim){alert("Selecione o intervalo.");return;}
+ const di=new Date(ini),df=new Date(fim);
+ const chuva=parseInt(diasChuva.value)||0;
+ const soPend=somentePendentes.checked;
+
+ let total=0,feitos=0,pend=0;
+ let tipos={"Lâmpada":0,"Braço":0,"Outros":0};
+ let ruas={},html="",sem={},acum=[];
+ let accF=0,accP=0;
+
+ dados.forEach(d=>{
+  if(d.dataPedido<di||d.dataPedido>df)return;
+  const p=!d.dataRealizado;
+  total++; p?pend++:feitos++;
+  if(soPend && !p)return;
+
+  ruas[d.rua]=(ruas[d.rua]||0)+1;
+
+  const desc=d.descricao.toLowerCase();
+  if(desc.includes("lâmpada")||desc.includes("lampada"))tipos["Lâmpada"]++;
+  else if(desc.includes("braço")||desc.includes("braco"))tipos["Braço"]++;
+  else tipos["Outros"]++;
+
+  const dom=new Date(d.dataPedido);
+  dom.setDate(dom.getDate()+(7-dom.getDay()));
+  const k=dom.toISOString().slice(0,10);
+  if(!sem[k])sem[k]={f:0,p:0};
+  p?sem[k].p++:sem[k].f++;
+
+  accF+=p?0:1;
+  accP+=p?1:0;
+
+  if(d.dataPedido.getDay()===0||d.dataPedido.getDate()===1)
+   acum.push({d:k,f:accF,p:accP});
+
+  html+=`<tr>
+   <td>${d.dataPedido.toLocaleDateString()}</td>
+   <td>${d.os}</td>
+   <td>${d.rua}</td>
+   <td>${d.bairro}</td>
+   <td>${d.descricao}</td>
+   <td><span class="badge ${p?"pendente":"feito"}">${p?"PENDENTE":"FEITO"}</span></td>
+  </tr>`;
+ });
+
+ tabela.innerHTML=html;
+ kTotal.innerText=total;
+ kPendentes.innerText=pend;
+ kFeitos.innerText=feitos;
+ kEficiencia.innerText=(total?(feitos/total*100):0).toFixed(1)+"%";
+
+ const dias=Math.max(1,((df-di)/86400000+1)-chuva);
+ medias.innerText=`Média/dia: ${(feitos/dias).toFixed(2)} | Média/mês: ${(feitos/(dias/30)).toFixed(2)} | Média/ano: ${(feitos/(dias/365)).toFixed(2)}`;
+
+ let diag="EXCELENTE";
+ if(kEficiencia.innerText.replace("%","")<50)diag="CRÍTICO";
+ else if(kEficiencia.innerText.replace("%","")<80)diag="ATENÇÃO";
+ diagnostico.innerText=`Diagnóstico: ${diag} | Reincidências: ${Object.values(ruas).filter(v=>v>1).length}`;
+
+ desenharTipos(tipos);
+ desenharSemanal(sem);
+ desenharAcumulado(acum);
+}
+
+function desenharTipos(t){
+ if(chartTipos)chartTipos.destroy();
+ chartTipos=new Chart(canvasTipos,{type:"pie",data:{labels:Object.keys(t),datasets:[{data:Object.values(t)}]}});
+}
+
+function desenharSemanal(s){
+ const l=Object.keys(s).sort();
+ if(chartSem)chartSem.destroy();
+ chartSem=new Chart(canvasSemanal,{type:"line",data:{labels:l,datasets:[
+  {label:"Realizados",data:l.map(k=>s[k].f),borderColor:"#2563eb",fill:false},
+  {label:"Pendentes",data:l.map(k=>s[k].p),borderColor:"#dc2626",fill:false}
+ ]}});
+}
+
+function desenharAcumulado(a){
+ if(chartAcum)chartAcum.destroy();
+ chartAcum=new Chart(canvasAcumulado,{type:"line",data:{labels:a.map(x=>x.d),datasets:[
+  {label:"Realizados",data:a.map(x=>x.f),borderColor:"#2563eb",fill:false},
+  {label:"Pendentes",data:a.map(x=>x.p),borderColor:"#dc2626",fill:false}
+ ]}});
+}
+
+async function exportarPDF(){
+ const { jsPDF } = window.jspdf;
+ const pdf = new jsPDF("p","mm","a4");
+ const canvas = await html2canvas(document.body,{scale:1});
+ const img = canvas.toDataURL("image/jpeg",0.85);
+ const w=190,h=277,ih=canvas.height*w/canvas.width;
+ let y=10,rest=ih;
+ pdf.addImage(img,"JPEG",10,y,w,ih);rest-=h;
+ while(rest>0){pdf.addPage();y=rest-ih+10;pdf.addImage(img,"JPEG",10,y,w,ih);rest-=h;}
+ pdf.save("SMOLamp_Relatorio_Completo.pdf");
+}
+
+async function exportarPDFResumo(){
+ const { jsPDF } = window.jspdf;
+ const pdf = new jsPDF("p","mm","a4");
+
+ const logoPM = await carregarImagem("brasao_pmcm.png");
+ const logoSec = await carregarImagem("sec_obras.png");
+
+ pdf.addImage(logoPM,"PNG",10,10,20,20);
+ pdf.addImage(logoSec,"PNG",180,10,20,20);
+
+ pdf.setFontSize(14);
+ pdf.text("SMOLamp – Relatório Sintético",105,20,{align:"center"});
+ pdf.setFontSize(9);
+ pdf.text("Prefeitura Municipal de Cachoeiras de Macacu, 2025",105,26,{align:"center"});
+
+ let y=40;
+ pdf.setFontSize(11);
+ pdf.text(`Total: ${kTotal.innerText}`,20,y); y+=7;
+ pdf.text(`Executados: ${kFeitos.innerText}`,20,y); y+=7;
+ pdf.text(`Pendentes: ${kPendentes.innerText}`,20,y); y+=7;
+ pdf.text(`Eficiência: ${kEficiencia.innerText}`,20,y); y+=12;
+
+ const graficos=[canvasTipos,canvasSemanal,canvasAcumulado];
+ for(const c of graficos){
+  if(y>230){pdf.addPage();y=20;}
+  pdf.addImage(c.toDataURL("image/jpeg",0.9),"JPEG",20,y,170,80);
+  y+=90;
+ }
+
+ pdf.save("SMOLamp_Relatorio_Sintetico.pdf");
+}
+
+function exportarDOCX(){
+ const {Document,Packer,Paragraph}=docx;
+ const doc=new Document({sections:[{children:[
+  new Paragraph("Relatório SMOLamp"),
+  new Paragraph("Total: "+kTotal.innerText),
+  new Paragraph("Executados: "+kFeitos.innerText),
+  new Paragraph("Pendentes: "+kPendentes.innerText),
+  new Paragraph("Eficiência: "+kEficiencia.innerText)
+ ]}]});
+ Packer.toBlob(doc).then(b=>{
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(b);
+  a.download="SMOLamp_Relatorio.docx";
+  a.click();
+ });
+}
+
+function carregarImagem(src){
+ return new Promise(res=>{
+  const img=new Image();
+  img.onload=()=>res(img);
+  img.src=src;
+ });
+}
+</script>
+
+</body>
+</html>
