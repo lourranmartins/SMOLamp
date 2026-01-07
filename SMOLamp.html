@@ -1,66 +1,132 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>SMOLamp — Gestão Integrada</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+Aqui está uma proposta completa e profissional para o arquivo `README.md` do seu projeto **SMOLamp**.
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f172a">
-<link rel="icon" type="image/png" href="SMOLamp.png">
-<link rel="apple-touch-icon" href="SMOLamp.png">
+Ele foi estruturado para documentar tanto a instalação quanto o **padrão de dados** necessário para as planilhas, o que é crucial para o funcionamento correto do sistema.
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/docx@8.3.0/build/index.min.js"></script>
+---
 
-<style>
-/* ================= ESTILOS GERAIS UNIFICADOS ================= */
-body{font-family:Arial,Helvetica,sans-serif;background:#f1f5f9;margin:0;padding:20px; display:flex; flex-direction:column; min-height:100vh;}
+# 💡 SMOLamp — Gestão Integrada
 
-/* NAV BAR (Navegação) */
-.nav-bar {
-    background: #1e293b;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-.nav-logo { height: 40px; margin-right: 10px; }
-.nav-btn {
-    background: #334155;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    flex-grow: 1;
-    text-align: center;
-}
-.nav-btn.active { background: #2563eb; ring: 2px solid white; }
+### Secretaria Municipal de Obras | Cachoeiras de Macacu - RJ
 
-/* CONTROLE DE ABAS */
-.tab-content { display: none; width: 100%; }
-.tab-content.active { display: block; }
+**SMOLamp** é uma aplicação web progressiva (PWA) desenvolvida para otimizar a gestão interna da Secretaria de Obras. A ferramenta unifica dois módulos essenciais: **Gestão de Arquivos Físicos** e **Monitoramento de Iluminação Pública**.
 
-/* ================= ESTILOS ORIGINAIS DO ARQUIVO 1 (ARQUIVOS) ================= */
-header{background:#0f172a;color:#fff;padding:15px;border-radius:8px;margin-bottom:20px}
-h1{margin:0;font-size:1.4em}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px; flex-grow: 1;}
-.env{background:#fff;padding:15px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.15)}
-.env h2{margin-top:0}
-label{font-weight:bold; display:block; margin-top:10px;}
-input,button{width:100%;padding:8px;margin-top:6px; box-sizing: border-box;}
-button{background:#2563eb;color:#fff;border:none;border-radius:6px;cursor:pointer}
-table{width:100%;border-collapse:collapse;font-size:.85em;margin-top:10px}
-th,td{border-bottom:1px solid #e2e8f0;padding:6px;vertical-align:top}
-th{background:#f8fafc}
+O sistema roda inteiramente no navegador (Client-Side), garantindo rapidez e privacidade, sem a necessidade de upload de dados sensíveis para servidores externos.
+
+---
+
+## 🚀 Funcionalidades
+
+### 📂 Módulo 1: Arquivos (Gestão Documental)
+
+Permite a localização rápida de documentos físicos em ambientes complexos de arquivamento.
+
+* **Ambiente 1 (Planilhas com Abas/Gavetas):**
+* Leitura de múltiplas abas de uma planilha Excel.
+* Detecção automática de marcadores físicos como "Gaveta X" ou "Prateleira X".
+* Busca indexada por item, nome do documento ou endereço físico.
+
+
+* **Ambiente 2 (Arquivo Geral):**
+* Processamento inteligente de "Relatórios Gerais" (formato matricial).
+* Identificação dinâmica de contextos (Caixas, Pastas, Assuntos).
+* Localização precisa por Estante, Armário, Prateleira e Caixa.
+
+
+
+### 💡 Módulo 2: Iluminação Pública (Dashboard)
+
+Transforma planilhas de Ordens de Serviço (OS) em um painel de inteligência.
+
+* **KPIs em Tempo Real:** Total de pedidos, pendências, execuções e taxa de eficiência (%).
+* **Filtros Avançados:** Seleção por intervalo de datas, desconto de dias de chuva e visualização apenas de pendentes.
+* **Gráficos Interativos:**
+* Distribuição por Tipo (Lâmpada, Braço, Outros).
+* Evolução Semanal (Linha do tempo de demandas vs. execução).
+* Acumulado (Curva de produtividade).
+
+
+* **Relatórios e Exportação:**
+* Geração de PDF Completo (Visual).
+* Geração de PDF Sintético (Resumo executivo com gráficos).
+* Exportação de dados tabulares para DOCX.
+* Diagnóstico automático (Crítico, Atenção, Excelente) e detecção de reincidências por rua.
+
+
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+* **Core:** HTML5, CSS3, JavaScript (ES6+).
+* **Processamento de Dados:** [SheetJS (xlsx)](https://sheetjs.com/) para leitura de arquivos Excel/CSV.
+* **Visualização:** [Chart.js](https://www.chartjs.org/) para renderização de gráficos.
+* **Exportação:**
+* [jsPDF](https://github.com/parallax/jsPDF) e [html2canvas](https://html2canvas.hertzen.com/) para geração de relatórios PDF.
+* [docx.js](https://docx.js.org/) para criação de documentos Word.
+
+
+
+---
+
+## 📋 Padrões de Entrada de Dados (Planilhas)
+
+Para que o sistema funcione corretamente, as planilhas devem seguir padrões mínimos de estrutura:
+
+### 1. Para o Módulo de Arquivos (Ambiente 1)
+
+* A planilha pode ter múltiplas abas.
+* O código procura por células contendo o texto **"Gaveta [N]"** ou **"Prateleira [N]"** para definir o local físico.
+* Os itens abaixo desse marcador são associados a ele até que outro marcador seja encontrado.
+
+### 2. Para o Módulo de Arquivos (Ambiente 2 - Geral)
+
+O sistema busca uma linha de cabeçalho que contenha as colunas:
+
+* `ITEM`
+* `DOCUMENTO` ou `NOME`
+* Colunas de localização como `ESTANTE`, `ARMÁRIO`, `PRATELEIRA`, `GAVETA` ou `CAIXA`.
+
+### 3. Para o Módulo de Iluminação
+
+A planilha deve conter uma aba nomeada como **"Iluminação"** (ou similar). As colunas esperadas (ordem aproximada) são:
+
+* **Coluna A:** Nome da Rua.
+* **Coluna B:** Bairro.
+* **Coluna E:** Data do Pedido (Data de entrada).
+* **Coluna F:** Data de Realização (Se vazio, conta como pendente).
+* **Coluna H:** Descrição do serviço (ex: "Troca de lâmpada").
+* **Coluna I:** Número da OS.
+
+---
+
+## 📦 Instalação e Uso
+
+1. Baixe todos os arquivos do repositório.
+2. Certifique-se de que a estrutura de arquivos esteja correta:
+```
+/
+├── index.html          (O código principal da aplicação)
+├── manifest.json       (Metadados para instalação PWA)
+├── sw.js               (Service Worker para funcionamento offline)
+├── SMOLamp.png         (Ícone da aplicação)
+├── brasao_pmcm.png     (Logo para relatórios)
+└── sec_obras.png       (Logo secundário)
+
+```
+
+
+3. Abra o arquivo `index.html` em qualquer navegador moderno (Chrome, Edge, Firefox).
+4. Para funcionalidade offline completa (PWA), recomenda-se servir os arquivos através de um servidor local (Live Server) ou hospedagem estática (GitHub Pages, Vercel).
+
+---
+
+## 📄 Licença e Autoria
+
+**Desenvolvido por:** Lourran Martins Fonseca
+**Vínculo:** Prefeitura Municipal de Cachoeiras de Macacu
+**Ano:** 2025/2026
+
+*Uso restrito e autorizado para fins de gestão pública municipal.*th{background:#f8fafc}
 .endereco{font-weight:bold;white-space:pre-wrap}
 
 /* AMBIENTE 2 (VISUAL) */
@@ -1293,5 +1359,6 @@ function carregarImagem(src){
 
 </body>
 </html>
+
 
 
